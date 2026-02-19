@@ -29,7 +29,7 @@ def get_guardian_key_path():
         print(">> ERROR: Guardian key was not found in %s" % key_path)
         sys.exit()
 
-def get_articles_path(debug = 1):
+def get_articles_path(debug = 0):
     global articles_path, workspace_path
     articles_path = os.path.join(workspace_path, "temp","guardian", "articles")
 
@@ -41,7 +41,7 @@ def get_articles_path(debug = 1):
 
     return articles_path
 
-def get_texts_path(debug = 1):
+def get_texts_path(debug = 0):
     global texts_path, workspace_path
     texts_path = os.path.join(workspace_path, "temp","guardian", "texts")
 

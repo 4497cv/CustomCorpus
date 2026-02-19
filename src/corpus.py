@@ -16,9 +16,11 @@ def __main__():
     workspace.set_workspace_path(os.getcwd())
 
     start_date = date(2026,1,1)
-    end_date = date(2026,2,11)
+    end_date = date(2026,2,1)
 
-    g = Guardian()
-    g.fetch_articles(start_date, end_date)
+    # create object for the Guardian API
+    g = Guardian(start_date, end_date)
+    # retrieve articles from the start date to the end date
+    g.fetch_articles()
 
 __main__()
