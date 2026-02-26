@@ -37,7 +37,6 @@ class Guardian():
             'api-key': self.key_api
         }
 
-
     def fetch_articles(self, debug = 1):
         resultados = []
         # string date conversion
@@ -90,7 +89,6 @@ class Guardian():
                     self.process_json_pages(filename, start_date_str)
                     self.process_articles_to_text_csv()
                     
-
     def process_json_pages(self, file_name, start_date_str, debug = 1):
         titulos = []
         articulos = []
@@ -155,7 +153,6 @@ class Guardian():
 
         if debug:
             print("All articles saved successfully.")
-
 
 
     def read_guardian_api_key(self, debug = 0):
