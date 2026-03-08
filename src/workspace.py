@@ -2,12 +2,13 @@
 import os
 import sys
 
-workspace_path = ""
+os.chdir("..")
+workspace_path = os.getcwd()
 key_path = ""
 articles_path = ""
 texts_path = ""
 
-def set_workspace_path(path, debug = 0):
+def set_workspace_path(path, debug = 1):
     global workspace_path
     if(os.path.exists(path)):
         workspace_path = path

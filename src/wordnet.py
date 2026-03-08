@@ -7,11 +7,17 @@ from nltk.stem import SnowballStemmer
 from nltk.tokenize import word_tokenize
 from nltk import pos_tag
 import os
+import workspace
+import sys
+from numpy import dot
+from numpy.linalg import norm
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 #nltk.download("wordnet")
 #nltk.download('punkt_tab')
 #nltk.download('averaged_perceptron_tagger_eng')
 #nltk.download('omw-1.4')
+
 #Creamos los objetos para usarlos más adelante
 porter = PorterStemmer()
 lancaster = LancasterStemmer()
@@ -50,7 +56,6 @@ def wordnet_test():
     # valores posibles VERB, NOUN, ADJ, ADV
     #print(wn.synsets("dog",pos=wn.VERB))
     #print(wn.synset('dog.n.01').definition())
-
     word="jumping"
     print(word," ===> ",porter.stem(word))
 
@@ -58,13 +63,10 @@ def wordnet_test():
     print(word," ===> ",porter.stem(word))
 
     words = ["program", "programming", "programmer", "programs","programmed"]
-
     example_sentence = "Python programmers often tend like programming in python because it's like english. We call people who program in python pythonistas."
-
     other_words = nltk.word_tokenize(example_sentence)
 
     print("Porter Stemmer -------------------------------")
-
     print("{0:20}{1:20}".format("Word","PorterStemmer"))
     for word in other_words:
         print("{0:20}{1:20}".format(word, porter.stem(word)))
@@ -79,18 +81,19 @@ def wordnet_test():
     for word in other_words:
         print("{0:20}{1:20}".format(word,snowball.stem(word)))
 
-
     words = ['bunnies','organization','polarize','jaguar','stabilize','destabilize','kingdoms','dramatic','favorable']
     print("{0:20}{1:20}{2:20}{3:20}".format("Word", "Porter Stem", "Lancaster Stem", "Snowball Stem"))
 
     for word in words:
         print("{0:20}{1:20}{2:20}{3:20}".format(word, porter.stem(word),lancaster.stem(word),snowball.stem(word)))
 
-
 def Corpus_DataAugmentation(article_path, file_name):
-
     nouns_list = []
     path = os.path.join(article_path, file_name)
+
+    if(not os.path.exists(path)):
+        print("Path %s does not exist" % path)
+        sys.exit()
 
     with open(path, "r", encoding="UTF-8") as f:
         article_text = f.read()
@@ -108,7 +111,6 @@ def Corpus_DataAugmentation(article_path, file_name):
         i = 0
         for token in tokens:
             for noun in nouns_list:
-                
                 if((noun in token) and (len(noun) == len(token))):
                     new_lemmas = []
                     synsets = wn.synsets(noun, pos=wn.NOUN)
@@ -130,20 +132,34 @@ def Corpus_DataAugmentation(article_path, file_name):
                         tokens[i] = new_noun
             i = i + 1
 
-    new_file = os.path.join(article_path, "augmented_{}.txt".format(file_name))
+    new_file = os.path.join(article_path, "augmented_{}".format(file_name))
 
     with open(new_file, "w", encoding = "UTF-8") as f2:
+        print("\ncreating %s" % new_file)
         for token in tokens:
             f2.write(token)
             f2.write(" ")
-        
-art_path = r"C:\Users\ie707560\Documents\git\CustomCorpus\temp\guardian\texts\artanddesign"
-file_name = "article69.txt"
-file_name_augmented = file_name.replace(".txt", "_augmented.txt")
 
-Corpus_DataAugmentation(art_path, "article69.txt")
+def wordnet():
+    file_name = "article69.txt"
+    art_path = os.path.join(workspace.get_texts_path(), "artanddesign")
+    file_name_augmented = "augmented_" + file_name
 
-f1 = open(os.path.join(art_path, file_name) , "r", encoding="UTF-8").read()
-f2 = open(os.path.join(art_path, file_name_augmented) , "r", encoding="UTF-8").read()
+    Corpus_DataAugmentation(art_path, file_name)
 
-print(cosine_distance(f1, f2))
+    f1 = open(os.path.join(art_path, file_name), encoding="utf-8").read()
+    f2 = open(os.path.join(art_path, file_name_augmented), encoding="utf-8").read()
+
+    vectorizer = TfidfVectorizer()
+    X = vectorizer.fit_transform([f1, f2]).toarray()
+
+    vect_1 = X[0]
+    vect_2 = X[1]
+
+    print("\nCosine Distance Between %s and %s: %f" % (file_name,
+                                                    file_name_augmented, 
+                                                    cosine_distance(vect_1, vect_2)))
+
+####################################################################################
+
+wordnet()
